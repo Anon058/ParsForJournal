@@ -37,9 +37,9 @@ namespace ParsForJournal
             EdgeDriverService service = EdgeDriverService.CreateDefaultService();
             var edgeOptions = new EdgeOptions();
             var downloadDirectory = textBox1.Text;
-            if(downloadDirectory == null)
+            if(string.IsNullOrEmpty(downloadDirectory))
             {
-                downloadDirectory = "C:\\Users\\sasha\\Downloads";
+                downloadDirectory = "download.default_directory";
             }
             else
             {
