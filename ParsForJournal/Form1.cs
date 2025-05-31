@@ -14,6 +14,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.DevTools.V128.Debugger;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
 
 namespace ParsForJournal
 {
@@ -66,10 +67,10 @@ namespace ParsForJournal
             webElement.SendKeys(OpenQA.Selenium.Keys.Enter);
 
             Thread.Sleep(5000);
-            IWebElement otchet = driver.FindElement(By.XPath("/html/body/div[1]/div[4]/nav/ul/li[5]/a"));
+            IWebElement otchet = driver.FindElement(By.XPath("/html/body/div/div[1]/div[4]/nav/ul/li[5]/a"));
             otchet.Click();
 
-            otchet = driver.FindElement(By.XPath("/html/body/div[1]/div[4]/nav/ul/li[5]/ul/li[1]/a"));
+            otchet = driver.FindElement(By.XPath("/html/body/div/div[1]/div[4]/nav/ul/li[5]/ul/li[1]/a"));
             otchet.Click();
 
             for (int i = 0; i < int.MaxValue; i++)
@@ -91,34 +92,31 @@ namespace ParsForJournal
                             Thread.Sleep(3000);
                             try
                             {
-                               
+                                string selectSemestr = comboBox1.Text;
                                 SelectElement period = new SelectElement(driver.FindElement(By.Name("TERMID")));
-                                if(comboBox1.Text == "1 полугодие")
+                                
+
+                                    var priod = driver.FindElements(By.CssSelector("input[type='hidden'][name='TERMID']"));
+                                    
+                                if(priod.Count > 0)
                                 {
+                                    var selectedValue = priod[0].GetAttribute("value");
+                                    if((selectedValue == "10" && selectSemestr == "1 полугодие") ||
+                                        (selectedValue == "9" && selectSemestr == "2 полугодие"))
+                                    {
+                                        continue;
+                                    }
+                                }
+                                
+                                if(selectSemestr == "1 полугодие")
                                 period.SelectByValue("9");
-                                    IWebElement priod = driver.FindElement(By.XPath("/html/body/div[2]/div[1]/div/div/div/div[2]/div[1]/div[1]/div[2]/div[5]/div/div/input[2]"));
-                                    IWebElement prid = priod.FindElement(By.Name("TERMID"));
-                                    var selectedValue = prid.GetAttribute("value");
-
-                                    if(selectedValue == "10")
-                                    {
-                                        continue;
-                                    }
-                                }
-                                else
-                                {
+                                if(selectSemestr == "2 полугодие")
                                 period.SelectByValue("10");
-
-                                    IWebElement priod = driver.FindElement(By.CssSelector("input[type='hidden']"));
-                                    var selectedValue = priod.GetAttribute("value");
-
-                                    if (selectedValue == "9")
-                                    {
-                                        continue;
-                                    }
-                                }
                             }
-                            catch { }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Ошибка при обработке полугодия: {ex.Message}");
+                            }
 
 
 
@@ -130,8 +128,8 @@ namespace ParsForJournal
 
                             try
                             {
-                                Thread.Sleep(6000);
-                                IWebElement setup = driver.FindElement(By.XPath("/html/body/div[2]/div[1]/div/div/div/div[2]/div[1]/div[1]/div[1]/div/div/button[3]"));
+                                Thread.Sleep(3000);
+                                IWebElement setup = driver.FindElement(By.XPath("//button[@title='Экспорт в Excel']"));//ошибьк
                                 setup.SendKeys(OpenQA.Selenium.Keys.Return);
 
                                 Thread.Sleep(3000);
