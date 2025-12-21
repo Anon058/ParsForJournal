@@ -69,6 +69,7 @@
             this.label1.Size = new System.Drawing.Size(412, 13);
             this.label1.TabIndex = 2;
             this.label1.Text = "Введите ПОЛНЫЙ путь до папки в которую будут скачиваться все excel файлы";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // textBox2
             // 
@@ -94,6 +95,7 @@
             this.label2.Size = new System.Drawing.Size(146, 13);
             this.label2.TabIndex = 5;
             this.label2.Text = "Введите имя пользователя";
+            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // label3
             // 
@@ -103,6 +105,7 @@
             this.label3.Size = new System.Drawing.Size(162, 13);
             this.label3.TabIndex = 6;
             this.label3.Text = "Введите пароль пользователя";
+            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // comboBox1
             // 
@@ -125,6 +128,7 @@
             this.label4.Size = new System.Drawing.Size(112, 13);
             this.label4.TabIndex = 8;
             this.label4.Text = "Выберите полугодие";
+            this.label4.Click += new System.EventHandler(this.label4_Click);
             // 
             // label5
             // 
@@ -134,6 +138,7 @@
             this.label5.Size = new System.Drawing.Size(55, 13);
             this.label5.TabIndex = 9;
             this.label5.Text = "Выбрано:";
+            this.label5.Click += new System.EventHandler(this.label5_Click);
             // 
             // label6
             // 
@@ -154,6 +159,7 @@
             this.label7.Size = new System.Drawing.Size(283, 13);
             this.label7.TabIndex = 11;
             this.label7.Text = "Если путь не указан, то будет скачиваться в загрузки";
+            this.label7.Click += new System.EventHandler(this.label7_Click);
             // 
             // Form1
             // 

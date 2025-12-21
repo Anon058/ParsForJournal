@@ -35,8 +35,8 @@ namespace ParsForJournal
         private void Test1()
         {
 
-            EdgeDriverService service = EdgeDriverService.CreateDefaultService();
-            var edgeOptions = new EdgeOptions();
+            ChromeDriverService service = ChromeDriverService.CreateDefaultService();
+            var edgeOptions = new ChromeOptions();
             var downloadDirectory = textBox1.Text;
             if(downloadDirectory == null)
             {
@@ -48,7 +48,7 @@ namespace ParsForJournal
             }
             edgeOptions.AddUserProfilePreference("intl.accept_languages", "nl");
             edgeOptions.AddUserProfilePreference("disable-popup-blocking", "true");
-            var driver = new EdgeDriver(service, edgeOptions);
+            var driver = new ChromeDriver(service, edgeOptions);
 
             driver.Navigate().GoToUrl("https://poo.susu.ru/");
             driver.Manage().Window.Maximize();
@@ -101,17 +101,17 @@ namespace ParsForJournal
                                 if(priod.Count > 0)
                                 {
                                     var selectedValue = priod[0].GetAttribute("value");
-                                    if((selectedValue == "10" && selectSemestr == "1 полугодие") ||
-                                        (selectedValue == "9" && selectSemestr == "2 полугодие"))
+                                    if((selectedValue == "20" && selectSemestr == "1 полугодие") ||
+                                        (selectedValue == "19" && selectSemestr == "2 полугодие"))
                                     {
                                         continue;
                                     }
                                 }
                                 
                                 if(selectSemestr == "1 полугодие")
-                                period.SelectByValue("9");
+                                period.SelectByValue("19");
                                 if(selectSemestr == "2 полугодие")
-                                period.SelectByValue("10");
+                                period.SelectByValue("20");
                             }
                             catch (Exception ex)
                             {
@@ -186,6 +186,36 @@ namespace ParsForJournal
         private void label6_Click(object sender, EventArgs e)
         {
             label6.Text = comboBox1.Text;
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
