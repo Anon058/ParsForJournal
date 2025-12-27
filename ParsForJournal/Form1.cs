@@ -25,36 +25,37 @@ namespace ParsForJournal
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        public void button1_Click(object sender, EventArgs e)
         {
             Test1();
         }
 
-       
 
-        private void Test1()
+
+        public void Test1()
         {
 
-            ChromeDriverService service = ChromeDriverService.CreateDefaultService();
-            var edgeOptions = new ChromeOptions();
+            EdgeDriverService service = EdgeDriverService.CreateDefaultService();
+            var edgeOptions = new EdgeOptions();
             var downloadDirectory = textBox1.Text;
-            if(downloadDirectory == null)
+            if (downloadDirectory == null)
             {
-                downloadDirectory = "C:\\Users\\sasha\\Downloads";
+                downloadDirectory = "C:\\";
             }
             else
             {
-            edgeOptions.AddUserProfilePreference("download.default_directory", downloadDirectory);
+                edgeOptions.AddUserProfilePreference("download.default_directory", downloadDirectory);
             }
             edgeOptions.AddUserProfilePreference("intl.accept_languages", "nl");
             edgeOptions.AddUserProfilePreference("disable-popup-blocking", "true");
-            var driver = new ChromeDriver(service, edgeOptions);
+            var driver = new EdgeDriver(service, edgeOptions);
+
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
 
             driver.Navigate().GoToUrl("https://poo.susu.ru/");
             driver.Manage().Window.Maximize();
 
-            Thread.Sleep(2500);
-            IWebElement webElement = driver.FindElement(By.Id("schools"));
+            IWebElement webElement = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("schools")));
 
             SelectElement selectElement = new SelectElement(driver.FindElement(By.Id("schools")));
             selectElement.SelectByValue("2");
@@ -66,97 +67,82 @@ namespace ParsForJournal
 
             webElement.SendKeys(OpenQA.Selenium.Keys.Enter);
 
-            Thread.Sleep(5000);
-            IWebElement otchet = driver.FindElement(By.XPath("/html/body/div/div[1]/div[4]/nav/ul/li[5]/a"));
+            IWebElement otchet = wait.Until(ExpectedConditions.ElementExists(By.XPath("/html/body/div/div[1]/div[4]/nav/ul/li[5]/a")));
             otchet.Click();
 
             otchet = driver.FindElement(By.XPath("/html/body/div/div[1]/div[4]/nav/ul/li[5]/ul/li[1]/a"));
             otchet.Click();
 
-            for (int i = 0; i < int.MaxValue; i++)
+            SelectElement group = new SelectElement(wait.Until(ExpectedConditions.ElementExists(By.Name("PCLID_IUP"))));
+            try
             {
-                try
+                for (int i = 0; i < int.MaxValue; i++)
                 {
-                    Thread.Sleep(3000);
-                    SelectElement group = new SelectElement(driver.FindElement(By.Name("PCLID_IUP")));
                     group.SelectByIndex(i);
 
+                    SelectElement course = new SelectElement(driver.FindElement(By.Name("SGID")));
                     for (int j = 0; j <= int.MaxValue; j++)
                     {
-                        try
+
+                        course.SelectByIndex(j);
+
+                        string selectSemestr = comboBox1.Text;
+                        SelectElement period = new SelectElement(wait.Until(ExpectedConditions.ElementExists(By.Name("TERMID"))));
+
+
+                        var priod = driver.FindElements(By.CssSelector("input[type='hidden'][name='TERMID']"));
+
+                        if (priod.Count > 0)
                         {
-
-                            SelectElement course = new SelectElement(driver.FindElement(By.Name("SGID")));
-                            course.SelectByIndex(j);
-
-                            Thread.Sleep(3000);
-                            try
-                            {
-                                string selectSemestr = comboBox1.Text;
-                                SelectElement period = new SelectElement(driver.FindElement(By.Name("TERMID")));
-                                
-
-                                    var priod = driver.FindElements(By.CssSelector("input[type='hidden'][name='TERMID']"));
-                                    
-                                if(priod.Count > 0)
-                                {
-                                    var selectedValue = priod[0].GetAttribute("value");
-                                    if((selectedValue == "20" && selectSemestr == "1 полугодие") ||
-                                        (selectedValue == "19" && selectSemestr == "2 полугодие"))
-                                    {
-                                        continue;
-                                    }
-                                }
-                                
-                                if(selectSemestr == "1 полугодие")
-                                period.SelectByValue("19");
-                                if(selectSemestr == "2 полугодие")
-                                period.SelectByValue("20");
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"Ошибка при обработке полугодия: {ex.Message}");
-                            }
-
-
-
-
-                            Thread.Sleep(3000);
-                            IWebElement load = driver.FindElement(By.Id("load-journal-btn"));
-                            load.Click();
-                            load.SendKeys(OpenQA.Selenium.Keys.Return);
-
-                            try
-                            {
-                                Thread.Sleep(3000);
-                                IWebElement setup = driver.FindElement(By.XPath("//button[@title='Экспорт в Excel']"));//ошибьк
-                                setup.SendKeys(OpenQA.Selenium.Keys.Return);
-
-                                Thread.Sleep(3000);
-                                IWebElement confirm = driver.FindElement(By.XPath("//button[text()='Да, больше не спрашивать']"));
-                                confirm.SendKeys(OpenQA.Selenium.Keys.Return);
-
-                            }
-                            catch
+                            var selectedValue = priod[0].GetAttribute("value");
+                            if ((selectedValue == "20" && selectSemestr == "1 полугодие") ||
+                                (selectedValue == "19" && selectSemestr == "2 полугодие"))
                             {
                                 continue;
                             }
                         }
+                        try
+                        {
+                            if (selectSemestr == "1 полугодие")
+                                period.SelectByValue("19");
+                            if (selectSemestr == "2 полугодие")
+                                period.SelectByValue("20");
+                        }
                         catch
                         {
-                            break;
+
                         }
+
+
+
+
+
+                        IWebElement load = wait.Until(ExpectedConditions.ElementExists(By.Id("load-journal-btn")));
+                        load.Click();
+                        load.SendKeys(OpenQA.Selenium.Keys.Return);
+
+
+                        IWebElement setup = wait.Until(ExpectedConditions.ElementExists(By.XPath("//button[@title='Экспорт в Excel']")));//ошибьк
+                        setup.SendKeys(OpenQA.Selenium.Keys.Return);
+
+                        IWebElement confirm = wait.Until(ExpectedConditions.ElementExists(By.XPath("//button[text()='Да, больше не спрашивать']")));
+                        confirm.SendKeys(OpenQA.Selenium.Keys.Return);
+
+
+
+
+
                     }
+
+                    driver.Quit();
                 }
-                catch
-                {
-                    break;
-                }
+            }
+            catch
+            {
 
             }
-
-            driver.Quit();
         }
+        
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
