@@ -14,6 +14,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
+using OpenQA.Selenium.DevTools.V143.Log;
 
 
 namespace ParsForJournal
@@ -77,41 +78,23 @@ namespace ParsForJournal
 
         public void SecondCourse()
         {
-            Dictionary<string, int> groups = new Dictionary<string, int>()
-            {
-                { "371_0", 100 },
-                { "372_0", 101 },
-                { "373_0", 102 },
-                { "374_0", 103 },
-                { "375_0", 104 },
-                { "376_0", 105 },
-                { "378_0", 106 },
-                { "379_0", 107 },
-                { "377_0", 110 },
-                { "383_0", 112 },
-                { "380_0", 120 },
-                { "381_0", 121 },
-                { "382_0", 130 },
-                { "369_0", 160 }
-            };
-
             IWebDriver driver = EnterToSchool();
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
             try
             {
-
+                var groups = StudyData.Groups;
             foreach(var groupp in groups)
             {
-            SelectElement group = new SelectElement(wait.Until(ExpectedConditions.ElementExists(By.Name("PCLID_IUP"))));
+            SelectElement group = new SelectElement(wait.Until(ExpectedConditions.ElementToBeClickable(By.Name("PCLID_IUP"))));
                 
-                Thread.Sleep(1500);
+                        Thread.Sleep(500);
                 group.SelectByValue(groupp.Key);
 
                     var lessons = StudyData.Lessons[groupp.Value.ToString()];
                     foreach(var lesson in lessons)
                     {
-                        SelectElement less = new SelectElement(wait.Until(ExpectedConditions.ElementExists(By.Name("SGID"))));
-
+                        SelectElement less = new SelectElement(wait.Until(ExpectedConditions.ElementToBeClickable(By.Name("SGID"))));
+                        Thread.Sleep(500);
                         less.SelectByValue(lesson.Key);
 
                         wait.Until(l => new SelectElement(l.FindElement(By.Name("SGID")))
