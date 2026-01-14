@@ -53,7 +53,7 @@ namespace ParsForJournal
             edgeOptions.AddUserProfilePreference("disable-popup-blocking", true);
             var driver = new EdgeDriver(service, edgeOptions);
 
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
 
             driver.Navigate().GoToUrl("https://poo.susu.ru/");
             driver.Manage().Window.Maximize();
@@ -101,7 +101,7 @@ namespace ParsForJournal
                         less.SelectByValue(lesson.Key);
 
 
-
+                        Thread.Sleep(500);
                         string selectSemestr = comboBox1.Text;
                         //var priod = driver.FindElements(By.CssSelector("input[type='hidden'][name='TERMID']"));
 
@@ -167,7 +167,7 @@ namespace ParsForJournal
 
                         IWebElement setup = wait.Until(ExpectedConditions.ElementExists(By.XPath("//button[@title='Экспорт в Excel']")));
                         setup.SendKeys(OpenQA.Selenium.Keys.Return);
-                        if (lesson.Key == "7503")  //7374 - первый
+                        if (lesson.Key == "7374")  //7374 - первый
                         {
                             Thread.Sleep(1500);
                         IWebElement confirm = driver.FindElement(By.XPath("//button[text()='Да, больше не спрашивать']"));
