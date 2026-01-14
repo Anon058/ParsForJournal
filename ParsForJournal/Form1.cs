@@ -15,6 +15,8 @@ using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using OpenQA.Selenium.DevTools.V143.Log;
+using System.Runtime.InteropServices;
+using OpenQA.Selenium.DevTools.V141.Runtime;
 
 
 namespace ParsForJournal
@@ -98,32 +100,60 @@ namespace ParsForJournal
                         Thread.Sleep(500);
                         less.SelectByValue(lesson.Key);
 
+
+
                         string selectSemestr = comboBox1.Text;
-                        var priod = driver.FindElements(By.CssSelector("input[type='hidden'][name='TERMID']"));
-                        SelectElement period = new SelectElement(wait.Until(ExpectedConditions.ElementExists(By.Name("TERMID"))));
+                        //var priod = driver.FindElements(By.CssSelector("input[type='hidden'][name='TERMID']"));
+
+                        string GetTermValue()
+                        {
+                            try
+                            {
+                                var el = driver.FindElement(By.CssSelector("input[type='hidden'][name='TERMID']"));
+                                return el.GetAttribute("value");
+                            }
+                            catch (NoSuchElementException)
+                            {
+                                return null;
+                            }
+                            catch (StaleElementReferenceException)
+                            {
+                                return null;
+                            }
+                            catch
+                            {
+                                return null;
+                            }
+                        }
+
+                        SelectElement period = new SelectElement(driver.FindElement(By.Name("TERMID")));
+
                         try
                         {
-
-                            if (priod.Count > 0)
+                            if (selectSemestr == "1 полугодие")
                             {
-                                var selectedValue = priod[0].GetAttribute("value");
-                                if ((selectedValue == "20" && selectSemestr == "1 полугодие") ||
-                                    (selectedValue == "19" && selectSemestr == "2 полугодие"))
-                                {
-                                    continue;
-                                }
+                                period.SelectByValue("19");
+
+                            }
+                            if (selectSemestr == "2 полугодие")
+                            {
+                                period.SelectByValue("20");
+
                             }
                         }
                         catch { }
                         try
                         {
-                            if (selectSemestr == "1 полугодие")
-                                period.SelectByValue("19");
-                            if (selectSemestr == "2 полугодие")
-                                period.SelectByValue("20");
+                            string selectedValue = GetTermValue();
+                            //string selectedValue = priod[0].GetAttribute("value");
+                            if ((selectedValue == "20" && selectSemestr == "1 полугодие") ||
+                                (selectedValue == "19" && selectSemestr == "2 полугодие"))
+                            {
+                                continue;   
+                            }
                         }
-                        catch
-                        { }
+                        catch { }
+                        
 
                         var load = wait.Until(ExpectedConditions.ElementExists(By.Id("load-journal-btn")));
 
@@ -137,7 +167,7 @@ namespace ParsForJournal
 
                         IWebElement setup = wait.Until(ExpectedConditions.ElementExists(By.XPath("//button[@title='Экспорт в Excel']")));
                         setup.SendKeys(OpenQA.Selenium.Keys.Return);
-                        if (lesson.Key == "7374")  //7374 - первый
+                        if (lesson.Key == "7503")  //7374 - первый
                         {
                             Thread.Sleep(1500);
                         IWebElement confirm = driver.FindElement(By.XPath("//button[text()='Да, больше не спрашивать']"));
@@ -158,6 +188,7 @@ namespace ParsForJournal
             }
 
         }
+
         bool IsNotCovered(IWebDriver driver, IWebElement element)
         {
             var js = (IJavaScriptExecutor)driver;
