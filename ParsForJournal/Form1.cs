@@ -167,7 +167,7 @@ namespace ParsForJournal
 
                         IWebElement setup = wait.Until(ExpectedConditions.ElementExists(By.XPath("//button[@title='Экспорт в Excel']")));
                         setup.SendKeys(OpenQA.Selenium.Keys.Return);
-                        if (lesson.Key == "7374")  //7374 - первый
+                        if (lesson.Key == "7703")  //7374 - первый
                         {
                             Thread.Sleep(1500);
                         IWebElement confirm = driver.FindElement(By.XPath("//button[text()='Да, больше не спрашивать']"));
