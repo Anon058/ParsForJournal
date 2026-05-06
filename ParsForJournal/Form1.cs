@@ -15,6 +15,8 @@ using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using OpenQA.Selenium.DevTools.V143.Log;
+using System.Runtime.InteropServices;
+using OpenQA.Selenium.DevTools.V141.Runtime;
 
 
 namespace ParsForJournal
@@ -35,6 +37,7 @@ namespace ParsForJournal
         
         public IWebDriver EnterToSchool()
         {
+            Console.WriteLine($"Выбранные настройки:\nПуть установки - {textBox1.Text}\nПользователь - {textBox2.Text}\nПароль - {textBox3.Text}\nПолугодие - {comboBox1.Text}");
             EdgeDriverService service = EdgeDriverService.CreateDefaultService();
             var edgeOptions = new EdgeOptions();
             var downloadDirectory = textBox1.Text;
@@ -50,7 +53,7 @@ namespace ParsForJournal
             edgeOptions.AddUserProfilePreference("disable-popup-blocking", true);
             var driver = new EdgeDriver(service, edgeOptions);
 
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
 
             driver.Navigate().GoToUrl("https://poo.susu.ru/");
             driver.Manage().Window.Maximize();
@@ -91,11 +94,85 @@ namespace ParsForJournal
                 group.SelectByValue(groupp.Key);
 
                     var lessons = StudyData.Lessons[groupp.Value.ToString()];
-                    foreach(var lesson in lessons)
+                    foreach (var lesson in lessons)
                     {
                         SelectElement less = new SelectElement(wait.Until(ExpectedConditions.ElementToBeClickable(By.Name("SGID"))));
                         Thread.Sleep(500);
                         less.SelectByValue(lesson.Key);
+
+
+                        Thread.Sleep(500);
+                        string selectSemestr = comboBox1.Text;
+                        //var priod = driver.FindElements(By.CssSelector("input[type='hidden'][name='TERMID']"));
+
+                        string GetTermValue()
+                        {
+                            try
+                            {
+                                var el = driver.FindElement(By.CssSelector("input[type='hidden'][name='TERMID']"));
+                                return el.GetAttribute("value");
+                            }
+                            catch (NoSuchElementException)
+                            {
+                                return null;
+                            }
+                            catch (StaleElementReferenceException)
+                            {
+                                return null;
+                            }
+                            catch
+                            {
+                                return null;
+                            }
+                        }
+
+                        SelectElement period = new SelectElement(driver.FindElement(By.Name("TERMID")));
+
+                        try
+                        {
+                            if (selectSemestr == "1 полугодие")
+                            {
+                                period.SelectByValue("19");
+
+                            }
+                            if (selectSemestr == "2 полугодие")
+                            {
+                                period.SelectByValue("20");
+
+                            }
+                        }
+                        catch { }
+                        try
+                        {
+                            string selectedValue = GetTermValue();
+                            //string selectedValue = priod[0].GetAttribute("value");
+                            if ((selectedValue == "20" && selectSemestr == "1 полугодие") ||
+                                (selectedValue == "19" && selectSemestr == "2 полугодие"))
+                            {
+                                continue;   
+                            }
+                        }
+                        catch { }
+                        
+
+                        var load = wait.Until(ExpectedConditions.ElementExists(By.Id("load-journal-btn")));
+
+                        ((IJavaScriptExecutor)driver)
+                            .ExecuteScript("arguments[0].scrollIntoView({block:'center'});", load);
+
+                        wait.Until(d => IsNotCovered(d, load));
+
+                        load.Click();
+
+
+                        IWebElement setup = wait.Until(ExpectedConditions.ElementExists(By.XPath("//button[@title='Экспорт в Excel']")));
+                        setup.SendKeys(OpenQA.Selenium.Keys.Return);
+                        if (lesson.Key == "7703")  //7374 - первый
+                        {
+                            Thread.Sleep(1500);
+                        IWebElement confirm = driver.FindElement(By.XPath("//button[text()='Да, больше не спрашивать']"));
+                        confirm.SendKeys(OpenQA.Selenium.Keys.Return);
+                        }
 
                         wait.Until(l => new SelectElement(l.FindElement(By.Name("SGID")))
                                             .SelectedOption.Text == lesson.Value.ToString());
@@ -110,6 +187,57 @@ namespace ParsForJournal
                 driver.Quit();
             }
 
+        }
+
+        bool IsNotCovered(IWebDriver driver, IWebElement element)
+        {
+            var js = (IJavaScriptExecutor)driver;
+            return (bool)js.ExecuteScript(@"
+        const elem = arguments[0];
+        const rect = elem.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        const el = document.elementFromPoint(x, y);
+        return elem === el || elem.contains(el);
+    ", element);
+        }
+        void WaitForAlertToDisappear(IWebDriver driver, WebDriverWait wait)
+        {
+            wait.Until(d =>
+            {
+                Thread.Sleep(100);
+                var alerts = d.FindElements(By.CssSelector("div.alert.alert-info"));
+                return alerts.Count == 0 || !alerts[0].Displayed;
+            });
+        }
+        public void ChangeHalfYear(WebDriverWait wait, WebDriver driver)
+        {
+            //string selectSemestr = comboBox1.Text;
+            //var priod = driver.FindElements(By.CssSelector("input[type='hidden'][name='TERMID']"));
+            //SelectElement period = new SelectElement(wait.Until(ExpectedConditions.ElementExists(By.Name("TERMID"))));
+            //try
+            //{
+
+            //    if (priod.Count > 0)
+            //    {
+            //        var selectedValue = priod[0].GetAttribute("value");
+            //        if ((selectedValue == "20" && selectSemestr == "1 полугодие") ||
+            //            (selectedValue == "19" && selectSemestr == "2 полугодие"))
+            //        {
+            //            continue;
+            //        }
+            //    }
+            //}
+            //catch { }
+            //try
+            //{
+            //    if (selectSemestr == "1 полугодие")
+            //        period.SelectByValue("19");
+            //    if (selectSemestr == "2 полугодие")
+            //        period.SelectByValue("20");
+            //}
+            //catch
+            //{ }
         }
         public void Test1()
         {
